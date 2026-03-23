@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amiibo Emulator Pro - Hardware Edition</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #121212; color: #ffffff; text-align: center; margin: 0; padding: 20px; }
+        .container { max-width: 400px; margin: auto; padding-bottom: 40px; }
+        button { width: 100%; padding: 12px; margin: 5px 0; font-size: 15px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        button:active { transform: scale(0.98); }
+        .btn-usb { background-color: #4CAF50; color: white; margin-bottom: 15px; }
+        .btn-usb-off { background-color: #d32f2f; color: white; margin-bottom: 25px; }
+        
+        .header-ranuras { border-bottom: 2px solid #e60012; padding-bottom: 10px; margin-bottom: 20px; }
+        
+        .ranura-item { background: #1e1e1e; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #333; text-align: left; position: relative; }
+        .ranura-numero { position: absolute; top: 15px; right: 15px; background: #333; color: #aaa; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
+        .ranura-titulo { margin-top: 0; margin-bottom: 10px; font-size: 18px; color: #00c3e3; }
+        .ranura-vacia { color: #666; font-style: italic; }
+        
+        .btn-burn { background-color: #e60012; color: white; }
+        .btn-play { background-color: #00c3e3; color: white; }
+        .btn-clear { background-color: #333; color: white; margin-top: 10px; }
+        .btn-sync { background-color: #555; color: white; margin-top: 5px; font-size: 13px;}
+        
+        .hidden { display: none !important; }
+
+        /* Mando Modal */
+        #modal-amiibo { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); z-index: 1000; display: flex; justify-content: center; align-items: center; }
+        .modal-content { background: #1e1e1e; width: 90%; max-width: 350px; padding: 20px; border-radius: 12px; border: 2px solid #e60012; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 15px; }
+        .modal-header h2 { margin: 0; font-size: 20px; color: #00c3e3;}
+        .btn-close { background: transparent; color: white; font-size: 24px; padding: 0; width: auto; margin: 0; }
+        
+        /* Cruceta y Botones */
+        .mando-virtual { background: #2a2a2a; padding: 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; margin-top: 15px;}
+        .dpad { display: grid; grid-template-areas: ". up ." "left . right" ". down ."; gap: 5px; }
+        .btn-dpad { background: #555; color: white; width: 40px; height: 40px; border-radius: 5px; padding: 0; margin: 0; display: flex; justify-content: center; align-items: center; font-size: 18px; touch-action: manipulation;}
+        .btn-dpad:active { background: #e60012; }
+        #up { grid-area: up; } #down { grid-area: down; } #left { grid-area: left; } #right { grid-area: right; }
+
+        .botones-accion { display: grid; grid-template-areas: ". X ." "Y . A" ". B ."; gap: 5px; }
+        .btn-accion { background: #555; color: white; width: 40px; height: 40px; border-radius: 50%; padding: 0; margin: 0; display: flex; justify-content: center; align-items: center; font-weight: bold; touch-action: manipulation;}
+        .btn-accion:active { background: #00c3e3; }
+        #btn-X { grid-area: X; } #btn-Y { grid-area: Y; } #btn-A { grid-area: A; } #btn-B { grid-area: B; }
+
+        /* Toast */
+        #toast-container { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+        .toast { background-color: #333; color: #fff; padding: 12px 24px; border-radius: 30px; font-size: 14px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); opacity: 0; transition: opacity 0.3s, transform 0.3s; transform: translateY(20px); text-align: center; border: 1px solid #555;}
+        .toast.show { opacity: 1; transform: translateY(0); }
+        .toast.success { border-color: #4CAF50; color: #4CAF50; }
+        .toast.info { border-color: #00c3e3; color: #00c3e3; }
+        .toast.warning { border-color: #e60012; color: #ffeb3b; }
+    </style>
+</head>
+<body>
+    <div id="toast-container"></div>
+
+    <input type="file" id="archivo-oculto" accept=".bin" class="hidden" onchange="procesarArchivo(event)">
+
+    <div class="container">
+        <h1>Gestor ESPiibo</h1>
+
+        <button class="btn-usb" onclick="conectarPuertoSerial()">🔌 Conectar ESP32 (USB)</button>
+        <button class="btn-usb-off" onclick="desconectarPuerto()">❌ Desconectar</button>
+
+        <div class="header-ranuras">
+            <h2>Ranuras de Hardware (0-19)</h2>
+            <p style="font-size: 13px; color: #aaa;">Sincroniza visualmente o quema nuevos Amiibos en el chip.</p>
+        </div>
+
+        <div id="lista-ranuras"></div>
+    </div>
+
+    <div id="modal-amiibo" class="hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-titulo">Nombre Amiibo</h2>
+                <button class="btn-close" onclick="cerrarModal()">×</button>
+            </div>
+            
+            <p style="color: #4CAF50; font-weight: bold; font-size: 14px; margin-bottom: 20px;">
+                ✅ Ranura activa en la Switch
+            </p>
+
+            <div class="mando-virtual">
+                <div class="dpad">
+                    <button class="btn-dpad" id="up" onmousedown="presionarArriba()" onmouseup="soltarBoton()" ontouchstart="presionarArriba()" ontouchend="soltarBoton()">▲</button>
+                    <button class="btn-dpad" id="down" onmousedown="presionarAbajo()" onmouseup="soltarBoton()" ontouchstart="presionarAbajo()" ontouchend="soltarBoton()">▼</button>
+                    <button class="btn-dpad" id="left" onmousedown="presionarIzquierda()" onmouseup="soltarBoton()" ontouchstart="presionarIzquierda()" ontouchend="soltarBoton()">◀</button>
+                    <button class="btn-dpad" id="right" onmousedown="presionarDerecha()" onmouseup="soltarBoton()" ontouchstart="presionarDerecha()" ontouchend="soltarBoton()">▶</button>
+                </div>
+                <div style="font-size: 12px; color: #aaa;">MANDO<br>PRO</div>
+                <div class="botones-accion">
+                    <button class="btn-accion" id="btn-X" onmousedown="presionarX()" onmouseup="soltarBoton()" ontouchstart="presionarX()" ontouchend="soltarBoton()">X</button>
+                    <button class="btn-accion" id="btn-Y" onmousedown="presionarY()" onmouseup="soltarBoton()" ontouchstart="presionarY()" ontouchend="soltarBoton()">Y</button>
+                    <button class="btn-accion" id="btn-A" onmousedown="presionarA()" onmouseup="soltarBoton()" ontouchstart="presionarA()" ontouchend="soltarBoton()">A</button>
+                    <button class="btn-accion" id="btn-B" onmousedown="presionarB()" onmouseup="soltarBoton()" ontouchstart="presionarB()" ontouchend="soltarBoton()">B</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function mostrarNotificacion(mensaje, tipo = "info") {
+            const container = document.getElementById("toast-container");
+            const toast = document.createElement("div");
+            toast.className = `toast ${tipo}`;
+            toast.innerText = mensaje;
+            container.appendChild(toast);
+            setTimeout(() => toast.classList.add("show"), 10);
+            setTimeout(() => { toast.classList.remove("show"); setTimeout(() => toast.remove(), 300); }, 3000);
+        }
+
+        const TOTAL_RANURAS = 20;
+        let ranuras = JSON.parse(localStorage.getItem('ranuras_hardware')) || new Array(TOTAL_RANURAS).fill(null);
+        let puertoSerialActivo = null;
+        let serialWriter = null;
+        let ranuraObjetivo = null;
+
+        async function conectarPuertoSerial() {
+            try {
+                puertoSerialActivo = await navigator.serial.requestPort();
+                await puertoSerialActivo.open({ baudRate: 115200 }); 
+                serialWriter = puertoSerialActivo.writable.getWriter();
+                mostrarNotificacion("¡Placa conectada y lista, corazón!", "success");
+            } catch (error) {
+                mostrarNotificacion("No se pudo conectar.", "warning");
+            }
+        }
+
+        async function desconectarPuerto() {
+            try {
+                if (serialWriter) { serialWriter.releaseLock(); serialWriter = null; }
+                if (puertoSerialActivo) { await puertoSerialActivo.close(); puertoSerialActivo = null; }
+                mostrarNotificacion("¡Puerto liberado!", "success");
+            } catch (e) {}
+        }
+
+        async function enviarBytes(arreglo) {
+            if (!serialWriter) return;
+            try { await serialWriter.write(new Uint8Array(arreglo)); } catch (e) {}
+        }
+
+        const BYTE_SOLTAR = [0x00, 0x00, 0x01, 0x08, 0x04, 0x02, 0x01, 0x80];
+        function presionarA() { enviarBytes([0x00, 0x01, 0x01, 0x08, 0x04, 0x02, 0x01, 0x80]); }
+        function presionarB() { enviarBytes([0x00, 0x00, 0x41, 0x08, 0x04, 0x02, 0x01, 0x80]); }
+        function presionarX() { enviarBytes([0x00, 0x02, 0x01, 0x08, 0x04, 0x02, 0x01, 0x80]); }
+        function presionarY() { enviarBytes([0x00, 0x00, 0x21, 0x08, 0x04, 0x02, 0x01, 0x80]); }
+        function presionarArriba()    { enviarBytes([0x00, 0x00, 0x00, 0x08, 0x04, 0x02, 0x01, 0x80]); }
+        function presionarAbajo()     { enviarBytes([0x00, 0x00, 0x00, 0x48, 0x04, 0x02, 0x01, 0x80]); }
+        function presionarIzquierda() { enviarBytes([0x00, 0x00, 0x00, 0x68, 0x04, 0x02, 0x01, 0x80]); }
+        function presionarDerecha()   { enviarBytes([0x00, 0x00, 0x00, 0x28, 0x04, 0x02, 0x01, 0x80]); }
+        function soltarBoton() { enviarBytes(BYTE_SOLTAR); }
+
+        function renderizarRanuras() {
+            const lista = document.getElementById('lista-ranuras');
+            lista.innerHTML = "";
+
+            for (let i = 0; i < TOTAL_RANURAS; i++) {
+                const amiiboNombre = ranuras[i];
+                const div = document.createElement('div');
+                div.className = 'ranura-item';
+                
+                let contenidoHtml = `<div class="ranura-numero">SN ${i}</div>`;
+                
+                if (amiiboNombre) {
+                    contenidoHtml += `
+                        <h3 class="ranura-titulo">${amiiboNombre}</h3>
+                        <button class="btn-play" onclick="activarMando(${i}, '${amiiboNombre}')">⚡ Activar y Usar Mando</button>
+                        <button class="btn-clear" onclick="prepararSubida(${i})">Reemplazar Amiibo</button>
+                        <button class="btn-clear" style="background:#555;" onclick="borrarRegistro(${i})">Desvincular (Solo visual)</button>
+                    `;
+                } else {
+                    contenidoHtml += `
+                        <h3 class="ranura-titulo ranura-vacia">Ranura Vacía (Visualmente)</h3>
+                        <button class="btn-burn" onclick="prepararSubida(${i})">📥 Quemar nuevo .bin</button>
+                        <button class="btn-sync" onclick="sincronizarNombre(${i})">🔗 Ya tiene Amiibo (Solo nombrar)</button>
+                    `;
+                }
+                
+                div.innerHTML = contenidoHtml;
+                lista.appendChild(div);
+            }
+        }
+
+        // --- LA NUEVA MAGIA NINJA PARA GITHUB ---
+        function sincronizarNombre(index) {
+            const nombre = prompt("Amor, ¿qué Amiibo ya tienes guardado en esta ranura física del chip?", "Mi Amiibo");
+            if (nombre && nombre.trim() !== "") {
+                ranuras[index] = nombre.trim();
+                localStorage.setItem('ranuras_hardware', JSON.stringify(ranuras));
+                renderizarRanuras();
+                mostrarNotificacion("¡Ranura sincronizada con éxito, vida mía!", "success");
+            }
+        }
+
+        function borrarRegistro(index) {
+            if(confirm("¿Seguro que quieres borrar la etiqueta visual? (El chip no se borrará)")) {
+                ranuras[index] = null;
+                localStorage.setItem('ranuras_hardware', JSON.stringify(ranuras));
+                renderizarRanuras();
+            }
+        }
+
+        function prepararSubida(index) {
+            if (!serialWriter) {
+                mostrarNotificacion("¡Amor, conecta el cable USB primero!", "warning");
+                return;
+            }
+            ranuraObjetivo = index;
+            document.getElementById('archivo-oculto').click(); 
+        }
+
+        function procesarArchivo(event) {
+            const file = event.target.files[0];
+            if(!file) return;
+
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                const buffer = new Uint8Array(e.target.result);
+                if(buffer.length !== 540) {
+                    mostrarNotificacion("El archivo debe pesar exactamente 540 bytes.", "warning");
+                    event.target.value = ""; 
+                    return;
+                }
+
+                mostrarNotificacion(`Quemando en Ranura ${ranuraObjetivo}... No desconectes.`, "info");
+                
+                await quemarEnEsp32(buffer, ranuraObjetivo);
+
+                ranuras[ranuraObjetivo] = file.name;
+                localStorage.setItem('ranuras_hardware', JSON.stringify(ranuras));
+                renderizarRanuras();
+                
+                mostrarNotificacion("¡Amiibo guardado permanentemente en el chip! 🍄", "success");
+                event.target.value = ""; 
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        async function quemarEnEsp32(buffer, slotIndex) {
+            try {
+                for(let offset = 0; offset < 540; offset += 20) {
+                    let low = offset & 0x7F;
+                    let high = (offset >> 7) & 0x7F;
+                    let header = new Uint8Array([0xA5, low, high, 0x14, 0x00, slotIndex, 0x90]);
+                    await serialWriter.write(header);
+                    await new Promise(resolve => setTimeout(resolve, 30));
+                    
+                    let chunk = buffer.slice(offset, offset + 20);
+                    await serialWriter.write(chunk);
+                    await new Promise(resolve => setTimeout(resolve, 30));
+                }
+            } catch (error) {
+                mostrarNotificacion("Hubo un error al quemar el archivo, vida mía.", "warning");
+                throw error;
+            }
+        }
+
+        async function activarMando(slotIndex, nombreAmiibo) {
+            if (!serialWriter) {
+                mostrarNotificacion("¡Conecta el ESP32 primero, caramelo!", "warning");
+                return;
+            }
+            try {
+                let cmdActivar = new Uint8Array([0xA5, slotIndex, 0x91]);
+                await serialWriter.write(cmdActivar);
+
+                document.getElementById('modal-titulo').innerText = nombreAmiibo;
+                document.getElementById('modal-amiibo').classList.remove('hidden');
+                mostrarNotificacion("¡Canal abierto! A jugar.", "success");
+            } catch(e) {
+                mostrarNotificacion("Error al activar la ranura.", "warning");
+            }
+        }
+
+        function cerrarModal() {
+            document.getElementById('modal-amiibo').classList.add('hidden');
+        }
+
+        renderizarRanuras();
+    </script>
+</body>
+</html>
