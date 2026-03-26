@@ -32,7 +32,7 @@ Una vez que el ESP32 tenga el firmware instalado, sigue estos pasos para inyecta
    * **⚡ Activar y Usar Mando** (Para iniciar la emulación).
    * **🔄 Reemplazar Amiibo** (Para cargar un archivo `.bin` diferente).
    * **❌ Desvincular** (Elimina el Amiibo de la interfaz visual).
-   <img width="408" height="244" alt="image" src="https://github.com/user-attachments/assets/8dcd6297-3d3d-4818-8df2-783ddf794faa" />
+      <img width="408" height="244" alt="image" src="https://github.com/user-attachments/assets/8dcd6297-3d3d-4818-8df2-783ddf794faa" />
 
 6. **Sincronizar con la Switch:** * Haz clic en **"⚡ Activar y Usar Mando"**.
    * En tu Nintendo Switch, dirígete a **Controles > Cambiar modo de sujeción u orden**.
