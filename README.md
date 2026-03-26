@@ -23,6 +23,7 @@ Esta es la aplicación complementaria para el proyecto de emulación de Amiibos 
    * Ve a los ajustes de Bluetooth de tu teléfono, busca el dispositivo (usualmente llamado `HC-06`) y vincúlalo. El PIN por defecto suele ser `1234` o `0000`.
 2. **Conexión en la App:** * Abre la aplicación **Allmibo**.
    * Presiona el botón verde de **Conectar** y automaticamente selecionara tu HC-06 si es que lo has vinculado antes.
+     
      <img width="441" height="78" alt="image" src="https://github.com/user-attachments/assets/e7017e0a-c431-472d-89d1-3ade8280eb40" />
 3. **Cargar el Amiibo:** * Selecciona una ranura (slot) disponible en la app.
    * Busca y selecciona el archivo `.bin` de tu Amiibo en el almacenamiento de tu teléfono.
