@@ -22,13 +22,18 @@ Este proyecto convierte un microcontrolador ESP32 en un control Pro emulado para
 Una vez que el ESP32 tenga el firmware instalado, sigue estos pasos para inyectar tus Amiibos:
 
 1. **Conectar la placa:** Conecta el ESP32 a tu PC mediante el cable USB.
-2. **Abrir el Gestor:** Abre el archivo `.html` de la interfaz en tu navegador basado en Chromium (Chrome, Edge, etc.).
+2. **Abrir el Gestor:** Abre el archivo `.html` de la interfaz en tu navegador basado en Chromium (Chrome, Edge, etc.) o tambien usar este link "https://dual-alexkey.github.io/Allmibo-esp32/".
 3. **Enlazar:** Presiona el botón **"🔌 Conectar ESP32 (USB)"** y selecciona el puerto de tu placa.
-4. **Cargar el Amiibo:** Haz clic en **"📥 Quemar nuevo .bin"** y selecciona el archivo de tu Amiibo. Al hacerlo, se desbloquearán 3 nuevas opciones en la interfaz:
+   <img width="455" height="90" alt="image" src="https://github.com/user-attachments/assets/e2c7bea9-573b-4243-b0b3-e349872df607" />
+5. **Cargar el Amiibo:** Haz clic en **"📥 Quemar nuevo .bin"** y selecciona el archivo de tu Amiibo.
+   <img width="417" height="192" alt="image" src="https://github.com/user-attachments/assets/77090df8-dbba-4be4-aa07-4991910ac260" />
+ Al hacerlo, se desbloquearán 3 nuevas opciones en la interfaz:
    * **⚡ Activar y Usar Mando** (Para iniciar la emulación).
    * **🔄 Reemplazar Amiibo** (Para cargar un archivo `.bin` diferente).
    * **❌ Desvincular** (Elimina el Amiibo de la interfaz visual).
-5. **Sincronizar con la Switch:** * Haz clic en **"⚡ Activar y Usar Mando"**.
+   <img width="408" height="244" alt="image" src="https://github.com/user-attachments/assets/8dcd6297-3d3d-4818-8df2-783ddf794faa" />
+
+6. **Sincronizar con la Switch:** * Haz clic en **"⚡ Activar y Usar Mando"**.
    * En tu Nintendo Switch, dirígete a **Controles > Cambiar modo de sujeción u orden**.
    * El ESP32 se sincronizará y aparecerá en la pantalla como un control Pro.
-6. **¡A jugar!:** Utiliza el mando virtual de la página HTML para seleccionar el juego donde deseas usar el Amiibo. La consola lo detectará automáticamente.
+7. **¡A jugar!:** Utiliza el mando virtual de la página HTML para seleccionar el juego donde deseas usar el Amiibo. La consola lo detectará automáticamente.
