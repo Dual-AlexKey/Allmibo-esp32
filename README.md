@@ -35,4 +35,4 @@ Esta es la aplicación complementaria para el proyecto de emulación de Amiibos 
 5. **¡A jugar!:** Cuando el juego te pida colocar el Amiibo, utiliza la aplicación para inyectar el archivo y la consola lo leerá instantáneamente.
 
 ---
-**Autor:** Fabrizio Alejandro Almirón Salazar
+**Autor:** Dual-AlexKey
