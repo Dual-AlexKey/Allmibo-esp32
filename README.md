@@ -27,6 +27,7 @@ Una vez que el ESP32 tenga el firmware instalado, sigue estos pasos para inyecta
    <img width="455" height="90" alt="image" src="https://github.com/user-attachments/assets/e2c7bea9-573b-4243-b0b3-e349872df607" />
 5. **Cargar el Amiibo:** Haz clic en **"📥 Quemar nuevo .bin"** y selecciona el archivo de tu Amiibo.
    <img width="417" height="192" alt="image" src="https://github.com/user-attachments/assets/77090df8-dbba-4be4-aa07-4991910ac260" />
+   
  Al hacerlo, se desbloquearán 3 nuevas opciones en la interfaz:
    * **⚡ Activar y Usar Mando** (Para iniciar la emulación).
    * **🔄 Reemplazar Amiibo** (Para cargar un archivo `.bin` diferente).
