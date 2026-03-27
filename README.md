@@ -14,14 +14,14 @@ Esta es la aplicación complementaria para el proyecto de emulación de Amiibos 
 
 ## 📥 Instalación de la Aplicación (APK)
 
-1. Ve y descarga el archivo `Allmibo.apk` en tu dispotivo android.
+1. Ve y descarga el archivo `AmiiDrop.apk` en tu dispotivo android.
 2. Instala el APK y concédele los permisos necesarios (Bluetooth y acceso a archivos).
 
 ## 🚀 Guía de Uso Rápido
 
 1. **Sincronización Inicial:** * Enciende tu placa ESP32.
    * Ve a los ajustes de Bluetooth de tu teléfono, busca el dispositivo (usualmente llamado `HC-06`) y vincúlalo. El PIN por defecto suele ser `1234` o `0000`.
-2. **Conexión en la App:** * Abre la aplicación **Allmibo**.
+2. **Conexión en la App:** * Abre la aplicación **AmiiDrop**.
    * Presiona el botón verde de **Conectar** y automaticamente selecionara tu HC-06 si es que lo has vinculado antes.
      
      <img width="441" height="78" alt="image" src="https://github.com/user-attachments/assets/e7017e0a-c431-472d-89d1-3ade8280eb40" />
